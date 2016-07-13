@@ -3,4 +3,12 @@ name = "robot_simulator"
 version = "0.1.0"
 authors = ["Thomas"]
 
+[lib]
+name = "robot_simulator"
+path = "src/lib.rs"
+
+[[bin]]
+name = "robot_simulation"
+path = "src/main.rs"
+
 [dependencies]
