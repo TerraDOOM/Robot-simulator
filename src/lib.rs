@@ -1,4 +1,5 @@
 use std::string;
+use std::io;
 
 mod robot_simulator {
     pub enum Direction {
@@ -45,12 +46,50 @@ mod robot_simulator {
     }
 
     fn advance(&mut self) -> () {
-        let pos = &mut self.position;
-        *pos = match self.direction {
-            Direction::North => (pos.0, pos.1 + 1),
-            Direction::South => (pos.0, pos.1 - 1),
-            Direction::East  => (pos.0 + 1, pos.1),
-            Direction::West  => (pos.0 - 1, pos.1),
+        self.position = match self.direction {
+            Direction::North => (self.position.0, self.position.1 + 1),
+            Direction::South => (self.position.0, self.position.1 - 1),
+            Direction::East  => (self.position.0 + 1, self.position.1),
+            Direction::West  => (self.position.0 - 1, self.position.1),
         };
+    }
+
+    fn get_instructions_err(&self, instr: &str) -> () {
+        let instr_str = instr.to_string().to_uppercase();
+        for i in &instr_str.chars() {
+            match i {
+                'R' => self.turn_right(),
+                'L' => self.turn_left(),
+                'A' => self.advance(),
+                _   => panic!("Unknown robot instruction: {}", i),
+            };
+        }
+    }
+
+    fn get_instructions_log(&self, instr: &str) -> () {
+        let instr_str = instr.to_string().to_uppercase();
+        for i in &instr_str.chars() {
+            match i {
+                'R' => self.turn_right(),
+                'L' => self.turn_left(),
+                'A' => self.advance(),
+                _   => {
+                         let err = io::Write(&mut io::stderr(), "Unknown robot instruction: {}", i);
+                         err.expect("Failed printing to stderr");
+                       },
+            };
+        }
+    }
+    
+    fn get_instructions(&self, instr: &str) -> () {
+        let instr_str = instr.to_string().to_uppercase();
+        for i in &instr_str.chars() {
+            match i {
+                'R' => self.turn_right(),
+                'L' => self.turn_left(),
+                'A' => self.advance(),
+                _   => {},
+            };
+        }
     }
 }
