@@ -1,64 +1,9 @@
 use std::fmt;
 use std::io;
 
-pub enum Direction {
-    North,
-    South,
-    East,
-    West,
-}
+mod direction;
 
-impl fmt::Debug for Direction {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Direction::{}", match *self {
-            Direction::North => "North",
-            Direction::South => "South",
-            Direction::East => "East",
-            Direction::West => "West",
-        })
-    }
-}
-
-impl fmt::Display for Direction {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match *self {
-            Direction::North => "North",
-            Direction::South => "South",
-            Direction::East => "East",
-            Direction::West => "West",
-        })
-    }
-}
-
-impl Copy for Direction {}
-impl Clone for Direction {
-    fn clone(&self) -> Direction {
-        *self
-    }
-}
-
-impl PartialEq for Direction {
-    fn eq(&self, other: &Direction) -> bool {
-        match *other {
-            Direction::North => match *self {
-                Direction::North => true,
-                _ => false,
-            },
-            Direction::South => match *self {
-                Direction::South => true,
-                _ => false,
-            },
-            Direction::East => match *self {
-                Direction::East => true,
-                _ => false,
-            },
-            Direction::West => match *self {
-                Direction::West => true,
-                _ => false,
-            },
-        }
-    }
-}
+use self::direction::*;
 
 // Point struct for position
 struct Point {
@@ -193,5 +138,80 @@ impl fmt::Debug for Robot {
 impl fmt::Display for Robot {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "(Robot at ({}, {}) facing {})", self.position().0, self.position().1, self.direction)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use robot::direction::*;
+    use robot::*;
+
+    // Test if the default constructor works
+    #[test]
+    fn default_values() {
+        let robot = Robot::new_default();
+        assert_eq!((0, 0), robot.position());
+        assert_eq!(Direction::North, robot.direction());
+    }
+
+    // Test if non-default constructor works
+    #[test]
+    fn non_default_values() {
+        let robot = Robot::new(1, 1, Direction::West);
+        assert_eq!((1, 1), robot.position());
+        assert_eq!(Direction::West, robot.direction());
+    }
+
+    // Test if Robots can have negative position
+    #[test]
+    fn negative_position() {
+        let robot = Robot::new(-1, -1, Direction::North);
+        assert_eq!(robot.position(), (-1, -1));
+    }
+    
+    #[test]
+    fn equality() {
+        let robot1 = Robot::new_default();
+        let robot2 = Robot::new_default();
+        assert!(robot1 == robot2);
+    }
+
+    #[test]
+    fn instructions() {
+        let robot1 = Robot::new(5, 5, Direction::West);
+        let mut robot2 = Robot::new_default();
+        robot2.send_instructions("ARALARALARALARALARALL");
+        assert!(robot1 == robot2);
+    }
+
+    #[test]
+    fn multiple_instructions() {
+        let robot1 = Robot::new(5, 5, Direction::West);
+        let mut robot2 = Robot::new_default();
+        robot2.send_instructions("ARALARALAR");
+        robot2.send_instructions("ALARALARALL");
+        assert!(robot1 == robot2);
+    }
+
+    #[test]
+    fn wrong_instructions_noerr() {
+        let mut robot = Robot::new_default();
+        robot.send_instructions("x");
+    }
+
+    #[test]
+    #[should_panic]
+    fn wrong_instructions_err() {
+        let mut robot = Robot::new_default();
+        robot.send_instructions_err("x");
+    }
+
+    #[test]
+    fn instructions_case_insensitive() {
+        // same as instructions() but with mixed case
+        let robot1 = Robot::new(5, 5, Direction::West);
+        let mut robot2 = Robot::new_default();
+        robot2.send_instructions("araLARAlaRAlaralarALL");
+        assert!(robot1 == robot2);
     }
 }

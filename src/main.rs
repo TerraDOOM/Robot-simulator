@@ -1,3 +1,6 @@
+#![cfg_attr(not(release), allow(unused_variables, dead_code))]
+#![cfg(bin)]
+
 mod robot;
 use robot::*;
 
