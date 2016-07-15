@@ -1,4 +1,5 @@
 use std::ops::{ Add, Sub };
+use std::cmp::Ordering;
 
 pub struct Degree(f64);
 
@@ -53,7 +54,6 @@ impl Add<Degree> for Degree {
     }
 }
 
-#[deprecated = "Use"]
 impl Sub<f64> for Degree {
     type Output = Degree;
 
@@ -93,20 +93,77 @@ impl PartialEq<Degree> for Degree {
     }
 }
 
-#[deprecated = "Use \"Degree as f64\" instead"]
 impl PartialEq<f64> for Degree {
     fn eq(&self, other: &f64) -> bool {
         if self.0 == *other {
             true
         }
         else {
-            match self.0 {
-                360f64 | 0f64 => match *other {
-                    360f64 | 0f64 => true,
-                    _ => false, 
-                },
-                _ => false,
-            }
+            false
+        }
+    }
+}
+
+impl PartialOrd<f64> for Degree {
+    fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
+        self.0.partial_cmp(other)
+    }
+
+        fn lt(&self, other: &f64) -> bool {
+        self.0.lt(other)
+    }
+
+    fn le(&self, other: &f64) -> bool {
+        if self.eq(other) {
+            true
+        }
+        else {
+            self.lt(other)
+        }
+    }
+    
+    fn gt(&self, other: &f64) -> bool {
+        self.0.gt(other)
+    }
+
+    fn ge(&self, other: &f64) -> bool {
+        if self.0 == *other {
+            true
+        }
+        else {
+            self.gt(other)
+        }
+    }
+}
+
+impl PartialOrd<Degree> for Degree {
+    fn partial_cmp(&self, other: &Degree) -> Option<Ordering> {
+        self.0.partial_cmp(&other.0)
+    }
+
+    fn lt(&self, other: &Degree) -> bool {
+        self.0.lt(&other.0)
+    }
+
+    fn le(&self, other: &Degree) -> bool {
+        if self.eq(other) {
+            true
+        }
+        else {
+            self.lt(other)
+        }
+    }
+    
+    fn gt(&self, other: &Degree) -> bool {
+        self.0.gt(&other.0)
+    }
+
+    fn ge(&self, other: &Degree) -> bool {
+        if self.0 == other.0 {
+            true
+        }
+        else {
+            self.gt(other)
         }
     }
 }
@@ -114,6 +171,7 @@ impl PartialEq<f64> for Degree {
 #[cfg(test)]
 mod test {
     use super::*;
+    use std::cmp::Ordering;
 
     #[test]
     fn equality() {
@@ -156,5 +214,14 @@ mod test {
     fn from() {
         let x = Degree::new(20f64);
         assert!(f64::from(x) == 20f64);
+    }
+
+    #[test]
+    fn ordinality() {
+        let x = Degree::new(20f64);
+        assert!(x > Degree::new_default() && x > 0f64);
+        assert!(x < Degree::new(30f64) && x < 30f64);
+        assert!(!(x < Degree::new(20f64)) && (x <= Degree::new(20f64)) && (x >= Degree::new(20f64)));
+        assert!(x.partial_cmp(&20f64) == Option::Some(Ordering::Equal))
     }
 }
