@@ -1,13 +1,41 @@
+//! Degree module for keeping track of advanced_robot direction
+
 use std::ops::{ Add, Sub };
 use std::cmp::Ordering;
 
+/// Main struct
 pub struct Degree(f64);
 
 impl Degree {
+    /// Default ctor for `Degree`
+    /// 
+    /// # Example
+    /// 
+    /// ```
+    /// let x = Degree::new_default();
+    /// 
+    /// assert_eq!(x.0, 0f64);
+    /// ```
     pub fn new_default() -> Degree {
         Degree(0f64)
     }
 
+    /// Custom ctor for `Degree`,
+    /// ensures that `Degree.0` stays within the 0..360 range
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let x = Degree::new(20f64);
+    ///
+    /// assert_eq!(x.0, 20f64);
+    /// ```
+    ///
+    /// ```
+    /// let x = Degree::new(380f64);
+    ///
+    /// assert_eq!(x.0, 20f64);
+    /// ```
     pub fn new(mut x: f64) -> Degree {
         if x > 360f64 { x %= 360f64; }
         if x < 0f64 { x = 360f64 + x % 360f64; }
