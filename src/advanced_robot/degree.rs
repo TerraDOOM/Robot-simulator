@@ -7,11 +7,10 @@ impl Degree {
         Degree(0f64)
     }
 
-    pub fn new(x: f64) -> Degree {
-        // TODO: FIX THIS
-        Degree(if > 360f64 => x % 360f64,
-            < 0f64 => 360f64 + x % 360f64,
-         })
+    pub fn new(mut x: f64) -> Degree {
+        if x > 360f64 { x %= 360f64; }
+        if x < 0f64 { x = 360f64 + x % 360f64; }
+        Degree(x)
     } 
 
     pub fn set(&mut self, x: f64) {
@@ -36,14 +35,10 @@ impl Add<f64> for Degree {
     type Output = Degree;
 
     fn add(self, rhs: f64) -> Degree {
-        let mut retval = Degree(self.0 + rhs);
-        if retval.0 < 0f64 {
-            retval.0 = 360f64 + retval.0;
-        }
-        if retval.0 > 360f64 {
-            retval.0 %= 360f64;
-        }
-        retval
+        let mut retval = self.0 + rhs;
+        if retval < 0f64 { retval += 360f64; }
+        if retval > 360f64 { retval %= 360f64; }
+        Degree(retval)
     }
 }
 
@@ -51,14 +46,10 @@ impl Add<Degree> for Degree {
     type Output = Degree;
 
     fn add(self, rhs: Degree) -> Degree {
-        let mut retval = Degree(self.0 + rhs.0);
-        if retval.0 < 0f64 {
-            retval.0 = 360f64 + retval.0;
-        }
-        if retval.0 > 360f64 {
-            retval.0 %= 360f64;
-        }
-        retval
+        let mut retval = self.0 + rhs.0;
+        if retval < 0f64 { retval += 360f64; }
+        if retval > 360f64 { retval %= 360f64; }
+        Degree(retval)
     }
 }
 
@@ -66,7 +57,10 @@ impl Sub<f64> for Degree {
     type Output = Degree;
 
     fn sub(self, rhs: f64) -> Degree {
-        self + Degree(-(rhs))
+        let mut retval = self.0 - rhs;
+        if retval < 0f64 { retval += 360f64; }
+        if retval > 360f64 { retval %= 360f64; }
+        Degree(retval)
     }
 }
 
@@ -74,7 +68,10 @@ impl Sub<Degree> for Degree {
     type Output = Degree;
     
     fn sub(self, rhs: Degree) -> Degree {
-        self + Degree(-(rhs.0))
+        let mut retval = self.0 - rhs.0;
+        if retval < 0f64 { retval += 360f64; }
+        if retval > 360f64 { retval %= 360f64; }
+        Degree(retval)
     }
 }
 
@@ -87,7 +84,7 @@ impl PartialEq<Degree> for Degree {
             match self.0 {
                 360f64 | 0f64 => match other.0 {
                     360f64 | 0f64 => true,
-                    _ => false, 
+                    _ => false,
                 },
                 _ => false,
             }
@@ -122,6 +119,7 @@ mod test {
         assert!(x == y);
         x.set(360f64);
         assert!(x == y);
+        assert!(Degree::new(720f64) == Degree::new(360f64));
     }
 
     #[test]
@@ -140,8 +138,7 @@ mod test {
 
     #[test]
     fn subtraction() {
-        assert!(Degree(20f64) - Degree(15f64) == Degree(5f64), "1");
-        assert!(Degree(0f64) - Degree(20f64) == Degree(340f64), "2");
-        assert!(Degree(720f64) == Degree(360f64), "3");
+        assert!(Degree::new(20f64) - Degree::new(15f64) == Degree::new(5f64), "1");
+        assert!(Degree::new(0f64) - Degree::new(20f64) == Degree::new(340f64), "2");
     }
 }
