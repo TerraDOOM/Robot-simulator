@@ -141,4 +141,12 @@ mod test {
         assert!(Degree::new(20f64) - Degree::new(15f64) == Degree::new(5f64), "1");
         assert!(Degree::new(0f64) - Degree::new(20f64) == Degree::new(340f64), "2");
     }
+
+    #[test]
+    #[allow(path_statements, unused_variables)]
+    fn clone() {
+        let x = Degree::new_default();
+        let y = x;
+        assert!(x == y);
+    }
 }
