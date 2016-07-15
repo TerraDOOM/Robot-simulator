@@ -18,9 +18,9 @@ impl Degree {
     }
 }
 
-impl Into<f64> for Degree {
-    fn into(self) -> f64 {
-        self.0
+impl From<Degree> for f64 {
+    fn from(x: Degree) -> f64 {
+        x.0
     }
 }
 
@@ -53,6 +53,7 @@ impl Add<Degree> for Degree {
     }
 }
 
+#[deprecated = "Use"]
 impl Sub<f64> for Degree {
     type Output = Degree;
 
@@ -92,6 +93,7 @@ impl PartialEq<Degree> for Degree {
     }
 }
 
+#[deprecated = "Use \"Degree as f64\" instead"]
 impl PartialEq<f64> for Degree {
     fn eq(&self, other: &f64) -> bool {
         if self.0 == *other {
@@ -148,5 +150,11 @@ mod test {
         let x = Degree::new_default();
         let y = x;
         assert!(x == y);
+    }
+
+    #[test]
+    fn from() {
+        let x = Degree::new(20f64);
+        assert!(f64::from(x) == 20f64);
     }
 }
