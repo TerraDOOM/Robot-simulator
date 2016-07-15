@@ -17,6 +17,12 @@ impl Degree {
     pub fn set(&mut self, x: f64) {
         self.0 = x;
     }
+
+    pub fn to_rad(&self) -> f64 {
+        use std::f64::consts::PI;
+        static PI_180: f64 = PI / 180f64;
+        self.0 * PI_180
+    }
 }
 
 impl From<Degree> for f64 {
@@ -223,5 +229,12 @@ mod test {
         assert!(x < Degree::new(30f64) && x < 30f64);
         assert!(!(x < Degree::new(20f64)) && (x <= Degree::new(20f64)) && (x >= Degree::new(20f64)));
         assert!(x.partial_cmp(&20f64) == Option::Some(Ordering::Equal))
+    }
+
+    #[test]
+    fn to_radian() {
+        use std::f64::consts::PI;
+        assert!(Degree::new(180f64).to_rad() == PI);
+        assert!(Degree::new(90f64).to_rad() == PI / 2f64);
     }
 }
